@@ -29,44 +29,50 @@ function divide(firstOperand, secondOperand) {
 function operate(operator) {
     let result;
     // If both operands have values, do the operation
-    if (firstOperand && secondOperand) {
-        switch(operator) {
-            case "add":
-                // Do the operation, then display the result
-                result = add(firstOperand, secondOperand);
-                input = String(result);
-                updateDisplay();
+    // if (firstOperand && secondOperand) {
 
-                // Prepare to continue operating
-                firstOperand = result;
-                secondOperand = null;
-            case "subtract":
-                result =  subtract(firstOperand, secondOperand);
-                firstOperand = result;
-                secondOperand = null;
-            case "multiply":
-                result = multiply(firstOperand, secondOperand);
-                firstOperand = result;
-                secondOperand = null;
-            case "divide":
-                result = divide(firstOperand, secondOperand);
-                firstOperand = result;
-                secondOperand = null;
-            default:
-                return "I'm sorry, Dave";
+        if (!firstOperand) {
+            firstOperand = Number(input);
+            input = '';
+            updateDisplay();
         }
-    }
+        else {
+            secondOperand = Number(input);
+            switch(operator) {
+                case "add":
+                    // Do the operation, then display the result
+                    result = add(firstOperand, secondOperand);
+                    input = String(result);
+                    updateDisplay();
+    
+                    // Prepare to continue operating
+                    firstOperand = result;
+                    secondOperand = null;
+                case "subtract":
+                    result =  subtract(firstOperand, secondOperand);
+                    firstOperand = result;
+                    secondOperand = null;
+                case "multiply":
+                    result = multiply(firstOperand, secondOperand);
+                    firstOperand = result;
+                    secondOperand = null;
+                case "divide":
+                    result = divide(firstOperand, secondOperand);
+                    firstOperand = result;
+                    secondOperand = null;
+                default:
+                    return "I'm sorry, Dave";
+            }
+        }
+        
+    // }
     // If only the first operand has a value, then update the second
-    else if (firstOperand && !secondOperand) {
-        secondOperand = Number(input);
-    }
+    // else if (firstOperand && !secondOperand) {
+        
+    // }
     // If even the first operand is null, update it then prepare
     // input for the next number
-    else if (!firstOperand) {
-        firstOperand = Number(input);
-        input = '';
-        updateDisplay;
-    }
+
 }
 
 // Get the number keys as a variable
