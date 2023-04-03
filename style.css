@@ -7,7 +7,7 @@
     display: inline-grid;
     grid-template-rows: 50px 50px 50px 50px 50px 50px;
     grid-template-columns: 60px 60px 60px 60px;
-    background-color: rgb(70, 70, 70);
+    background-color: rgb(202, 197, 197);
 }
 
 .display {
@@ -42,4 +42,8 @@
     grid-row: 2 / 7;
     grid-column: 4 / 5;
     display: grid;
+}
+
+.operators > div {
+    border: 1px solid red;
 }
