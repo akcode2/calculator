@@ -40,29 +40,28 @@ function operate(operator) {
             secondOperand = Number(input);
             switch(operator) {
                 case "add":
-                    // Do the operation, then display the result
+                    // Do the operation
                     result = add(firstOperand, secondOperand);
-                    input = String(result);
-                    updateDisplay();
-    
-                    // Prepare to continue operating
-                    firstOperand = result;
-                    secondOperand = null;
+                    break;
                 case "subtract":
                     result =  subtract(firstOperand, secondOperand);
-                    firstOperand = result;
-                    secondOperand = null;
+                    break;
                 case "multiply":
                     result = multiply(firstOperand, secondOperand);
-                    firstOperand = result;
-                    secondOperand = null;
+                    break;
                 case "divide":
                     result = divide(firstOperand, secondOperand);
-                    firstOperand = result;
-                    secondOperand = null;
+                    break;
                 default:
-                    return "I'm sorry, Dave";
+                    result = "I'm sorry, Dave";
             }
+            // Display the result
+            input = String(result);
+            updateDisplay();
+
+            // Prepare to continue operating
+            firstOperand = result;
+            secondOperand = null;
         }
         
     // }
