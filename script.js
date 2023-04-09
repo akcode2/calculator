@@ -1,110 +1,198 @@
-let firstOperand = null;
-let secondOperand = null;
-let operator = null;
-
 let input = '';
+let result = null;
+let opComplete = null;
 
-function updateDisplay() {
-    display.innerText = input;
-}
-
-const display = document.querySelector('.display');
-
-function add(firstOperand, secondOperand) {
-    return firstOperand + secondOperand;
-}
-
-function subtract(firstOperand, secondOperand) {
-    return firstOperand - secondOperand;
-}
-
-function multiply(firstOperand, secondOperand) {
-    return firstOperand * secondOperand;
-}
-
-function divide(firstOperand, secondOperand) {
-    return firstOperand / secondOperand;
-}
-
-function operate(operator) {
-    let result;
-    // If both operands have values, do the operation
-    // if (firstOperand && secondOperand) {
-
-        if (!firstOperand) {
-            firstOperand = Number(input);
-            input = '';
-            updateDisplay();
-        }
-        else {
-            secondOperand = Number(input);
-            switch(operator) {
-                case "add":
-                    // Do the operation
-                    result = add(firstOperand, secondOperand);
-                    break;
-                case "subtract":
-                    result =  subtract(firstOperand, secondOperand);
-                    break;
-                case "multiply":
-                    result = multiply(firstOperand, secondOperand);
-                    break;
-                case "divide":
-                    result = divide(firstOperand, secondOperand);
-                    break;
-                default:
-                    result = "I'm sorry, Dave";
-            }
-            // Display the result
-            input = String(result);
-            updateDisplay();
-
-            // Prepare to continue operating
-            firstOperand = result;
-            secondOperand = null;
-        }
-        
-    // }
-    // If only the first operand has a value, then update the second
-    // else if (firstOperand && !secondOperand) {
-        
-    // }
-    // If even the first operand is null, update it then prepare
-    // input for the next number
-
-}
-
-// Get the number keys as a variable
-const numKeys = document.querySelectorAll('.number-keys > div');
-
-// When a number is clicked, append its value to the 'input' string
-// then update the display
-numKeys.forEach((key) => {
+// Select all number keys and operators except for 'equals'
+const inputKeys = document.querySelectorAll('.number-keys > div, .operators > div:not(:last-child)');
+inputKeys.forEach((key) => {
     key.addEventListener('click', () => {
-        input += `${key.innerText}`;
-        updateDisplay();
-    });
-});
-
-// Get the operator keys as a variable
-const operKeys = document.querySelectorAll('.operators > div');
-// When an operator key is clicked
-operKeys.forEach((key) => {
-    key.addEventListener('click', () => {
-        // Trigger the operate function
-        operate(operator);
-        // Except for '=', update operator with the selected key
-        if (key.id !== 'equals') {
-            operator = key.id;
-        }
+        operate(key.innerText);
     })
 })
 
-// The equals key has the special purpose of resetting operands
-// and operator when it is clicked
-const equalsKey = document.getElementById('equals');
-equalsKey.addEventListener('click', () => {
-    firstOperand = null;
-    secondOperand = null;
-    operator = null;
+function operate(key) {
+    // Validate input
+
+    // If key was an operator
+    if (key.match(/([+\-*/])/)) {
+        // If the input string ends in an operator (and a space), update it
+        if ((input.slice(-2)).match(/([+\-*/])\s*/)) {
+            input = input.slice(0, -2) + key + '';
+            
+        }    
+
+        // If the input string is a complete operation, compute result and
+        // use it as the beginning of a new operation
+        else if (isValidOperation()) {
+            result = compute();
+            input = `${result} ${key} `;
+            result = null;
+            updateDisplay();
+        }
+        // Otherwise append the operator to the string (surrounded by whitespace chars)
+        else {
+            input += ' ' + key + ' ';
+            updateDisplay();
+        }
+    }
+    // If key was an integer
+    else if (parseInt(key)) {
+        // If an operation was just completed, then number key should clear result
+        // and start a new input
+        if (opComplete !== null) {
+            input = key;
+            opComplete = null;
+            updateDisplay();
+        }
+        // Otherwise, append number to input string. 
+        else {
+            input += key;
+
+            // If input string comprises an operation, compute the result and display it.
+            if (isValidOperation()) {
+                result = compute();
+            }
+        }
+    }
+
+    updateDisplay();
+}
+
+// Determines if input string comprises a complete operation
+function isValidOperation() {
+    // This regular expression will match the sequence:
+    // (1 or more digits)(1 or more whitespaces)(an arithmetic operator)(optionally, 1 or more whitespaces)(optionally, 1 or more digits)
+    // secondOperand is optional and will be `undefined` if absent
+    const regex = /(\d+)\s*([+\-*/])\s*(\d+)?/;
+
+    // If no match, stop execution and return false
+    if (input.match(regex) === null) {
+        return false;
+    }
+
+    // Destructure the regular expression match
+    const [_, firstOperand, operator, secondOperand] = input.match(regex);
+    
+    // Return true only if all parameters exist
+    if (firstOperand && operator && secondOperand) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+// Computes a result from a valid operation
+function compute() {
+    const regex = /(\d+)\s*([+\-*/])\s*(\d+)?/;
+    const [_, firstOperand, operator, secondOperand] = input.match(regex);
+
+    switch(operator) {
+        case "+":
+            return Number(firstOperand) + Number(secondOperand);
+        case "-":
+            return Number(firstOperand) - Number(secondOperand);
+        case "*":
+            return Number(firstOperand) * Number(secondOperand);
+        case "/":
+            return Number(firstOperand) / Number(secondOperand);
+        default:
+            return "I'm sorry, Dave. I'm afraid I can't do that.";
+    }
+}
+
+// Show the input in the display, and `= result` if it exists
+const display = document.querySelector('.display');
+function updateDisplay() {
+    if (result) {
+        display.innerText = `${input} = ${result}`;
+    }
+    else {
+        display.innerText = `${input}`;
+    }
+}
+
+// Get backspace key as a variable
+const backspaceKey = document.querySelector('.backspace');
+backspaceKey.addEventListener('click', () => {
+    backspace();
 })
+function backspace() {
+    const keyToDelete = input.slice(-1);
+
+    // If a space is being deleted, actually delete 'space' 'operator' 'space';
+    if (keyToDelete.match(/\s+/)) {
+        input = input.slice(0,-3);
+    }
+    else {
+        input = input.slice(0, -1);
+    }
+
+    // Update result so updateDisplay behaves appropriately
+    if (isValidOperation()) {
+        result = compute();
+    }
+    else {
+        result = null;
+    }
+    updateDisplay();
+}
+
+// Enable keyboard input
+document.addEventListener('keydown', (event) => {
+    const keyValue = getKeyValue(event.key);
+    if (keyValue !== null) {
+        if (keyValue === "Backspace") {
+            deleteInput();
+        }
+        else {
+            // Trigger the operate function with every valid key press
+            operate(keyValue);
+        }
+        // e.g. prevent arrow keys from scrolling
+        event.preventDefault();
+    }
+})
+
+function getKeyValue(key) {
+    switch (key) {
+      case "0":
+        return "0";
+      case "1":
+        return "1";
+      case "2":
+        return "2";
+      case "3":
+        return "3";
+      case "4":
+        return "4";
+      case "5":
+        return "5";
+      case "6":
+        return "6";
+      case "7":
+        return "7";
+      case "8":
+        return "8";
+      case "9":
+        return "9";
+      case "+":
+        return "+";
+      case "-":
+        return "-";
+      case "*":
+        return "*";
+      case "/":
+        return "/";
+    //   case ".":
+    //     return ".";
+    //   case "Enter":
+    //     return "=";
+    //   case "Escape":
+    //     return "C";
+       case "Backspace":
+         return backspace();
+      default:
+        return null;
+    }
+  }
