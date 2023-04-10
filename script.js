@@ -215,7 +215,7 @@ function decimal() {
 }
 
 // Get equals key as a variable
-const equalsKey = document.getElementById('equals');
+const equalsKey = document.getElementById('=');
 equalsKey.addEventListener('click', () => {
     if (isValidOperation()) {
         result = compute();
