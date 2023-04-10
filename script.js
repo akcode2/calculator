@@ -17,16 +17,19 @@ function operate(key) {
     if (key.match(/([+\-*/])/)) {
         // If the input string ends in an operator (and a space), update it
         if ((input.slice(-2)).match(/([+\-*/])\s*/)) {
-            input = input.slice(0, -2) + key + '';
-            
+            input = input.slice(0, -2) + key + ' ';
+            updateDisplay();
         }    
-
         // If the input string is a complete operation, compute result and
         // use it as the beginning of a new operation
         else if (isValidOperation()) {
             result = compute();
             input = `${result} ${key} `;
             result = null;
+            updateDisplay();
+        }
+        else if (input === '' || input === '-') {
+            input = 0 + ' ' + key + ' ';
             updateDisplay();
         }
         // Otherwise append the operator to the string (surrounded by whitespace chars)
@@ -61,9 +64,9 @@ function operate(key) {
 // Determines if input string comprises a complete operation
 function isValidOperation() {
     // This regular expression will match the sequence:
-    // (1 or more digits)(1 or more whitespaces)(an arithmetic operator)(optionally, 1 or more whitespaces)(optionally, 1 or more digits)
+    // (1 or more digits with (1 or 0 negative signs))(1 or more whitespaces)(1 or 0 arithmetic operators)(optionally, 1 or more whitespaces)(optionally, 1 or more digits with (1 or 0 negative signs))
     // secondOperand is optional and will be `undefined` if absent
-    const regex = /(\d+)\s*([+\-*/])\s*(\d+)?/;
+    const regex = /(-?\d+)\s*([+\-*/]?)\s*(-?\d+)?/;
 
     // If no match, stop execution and return false
     if (input.match(regex) === null) {
@@ -84,7 +87,7 @@ function isValidOperation() {
 
 // Computes a result from a valid operation
 function compute() {
-    const regex = /(\d+)\s*([+\-*/])\s*(\d+)?/;
+    const regex = /(-?\d+)\s*([+\-*/]?)\s*(-?\d+)?/;
     const [_, firstOperand, operator, secondOperand] = input.match(regex);
 
     switch(operator) {
@@ -110,6 +113,50 @@ function updateDisplay() {
     else {
         display.innerText = `${input}`;
     }
+}
+
+// Change sign of input string
+const changeSignKey = document.querySelector('.change-sign');
+changeSignKey.addEventListener('click', () => {
+    changeSign();
+})
+function changeSign() {
+    const regex = /(-?\d+)\s*([+\-*/]?)\s*(-?\d+)?/;
+
+    // If no match, input is empty, simply append sign
+    if (input.match(regex) === null) {
+        input = '-';
+    }
+    else {
+        let [, firstOperand, operator, secondOperand] = input.match(regex);
+        if (secondOperand) {
+            if (secondOperand.charAt(0) === '-') {
+                secondOperand = secondOperand.slice(1,)
+            }
+            else {
+                secondOperand = '-' + secondOperand;
+            }
+            input = firstOperand + ' ' + operator + ' ' + secondOperand;
+            if (isValidOperation()) {
+                result = compute();
+            }
+        }
+        else if (!secondOperand && operator)
+        {
+            secondOperand == '-';
+            input = firstOperand + ' ' + operator + ' ' + secondOperand;
+        }
+        else if (firstOperand) {
+            if (firstOperand.charAt(0) === '-') {
+                firstOperand = firstOperand.slice(1,);
+            }
+            else {
+                firstOperand = '-' + firstOperand;
+            }
+            input = firstOperand;
+        }
+    }
+    updateDisplay();
 }
 
 // Get backspace key as a variable
@@ -143,7 +190,7 @@ document.addEventListener('keydown', (event) => {
     const keyValue = getKeyValue(event.key);
     if (keyValue !== null) {
         if (keyValue === "Backspace") {
-            deleteInput();
+            backspace();
         }
         else {
             // Trigger the operate function with every valid key press
@@ -191,7 +238,7 @@ function getKeyValue(key) {
     //   case "Escape":
     //     return "C";
        case "Backspace":
-         return backspace();
+         return "Backspace";
       default:
         return null;
     }
