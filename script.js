@@ -115,6 +115,9 @@ function compute() {
 const display = document.querySelector('.display');
 function updateDisplay() {
     if (result) {
+        if (result === Infinity) {
+            hal();
+        }
         display.innerText = `${input} = ${result}`;
     }
     else {
@@ -330,3 +333,19 @@ function getKeyValue(key) {
         return null;
     }
   }
+
+function hal() {
+
+    // Create easter egg elements and attach to title node
+    const newParagraph = document.createElement('p');
+    const halText = document.createTextNode("I'm sorry, Dave. I'm afraid I can't do that.");
+    newParagraph.appendChild(halText);
+    const title = document.querySelector('.title');
+    title.innerText = 'HALculator 9000';
+    title.appendChild(newParagraph);
+
+    const halImage = document.createElement('img');
+    halImage.id = "hal";
+    halImage.src = "./HAL9000.svg"
+    document.querySelector('.easter-egg').appendChild(halImage);
+}

@@ -105,3 +105,33 @@ body {
 #\= {
     border-bottom-right-radius: 12px;
 }
+
+p{
+    color: #81b622; 
+    font-family: "Courier";
+    font-size: 20px;
+    margin: 10px 0 0 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 30em;
+    animation: type 4s steps(60, end); 
+  }
+  
+@keyframes type{ 
+from { width: 0; } 
+}
+
+.easter-egg {
+    position: absolute;
+    top: 1%;
+    left: 1%;
+}
+
+#hal {
+    animation: fadeIn 5s;
+}
+
+@keyframes fadeIn{
+    0% { opacity: 0; }
+    100% { opacity: 1 }
+}
