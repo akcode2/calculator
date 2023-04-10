@@ -39,17 +39,25 @@ function operate(key) {
         }
     }
     // If key was an integer
-    else if (parseInt(key)) {
+    else if (!isNaN(key)) {
         // If an operation was just completed, then number key should clear result
         // and start a new input
         if (opComplete !== null) {
             input = key;
             opComplete = null;
+            result = null;
             updateDisplay();
+            
         }
         // Otherwise, append number to input string. 
         else {
-            input += key;
+            // If the first key entered is zero, let input be zero
+            if (key === "0" && input === '') {
+                input = '0';
+            }
+            else {
+                input += key;
+            }
 
             // If input string comprises an operation, compute the result and display it.
             if (isValidOperation()) {
@@ -57,7 +65,6 @@ function operate(key) {
             }
         }
     }
-
     updateDisplay();
 }
 
@@ -207,6 +214,19 @@ function decimal() {
     updateDisplay();
 }
 
+// Get equals key as a variable
+const equalsKey = document.getElementById('equals');
+equalsKey.addEventListener('click', () => {
+    if (isValidOperation()) {
+        result = compute();
+        opComplete = true;
+        updateDisplay();
+    }
+    else {
+        allclear();
+    }
+})
+
 
 // Get backspace key as a variable
 const backspaceKey = document.querySelector('.backspace');
@@ -232,6 +252,7 @@ function backspace() {
     else {
         result = null;
     }
+
     updateDisplay();
 }
 
@@ -247,9 +268,6 @@ function allclear() {
     opComplete = null;
     display.innerText = '0';
 }
-
-// Get equals key as a variable
-const 
 
 // Enable keyboard input
 document.addEventListener('keydown', (event) => {
