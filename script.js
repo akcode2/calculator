@@ -66,7 +66,7 @@ function isValidOperation() {
     // This regular expression will match the sequence:
     // (1 or more digits with (1 or 0 negative signs))(1 or more whitespaces)(1 or 0 arithmetic operators)(optionally, 1 or more whitespaces)(optionally, 1 or more digits with (1 or 0 negative signs))
     // secondOperand is optional and will be `undefined` if absent
-    const regex = /(-?\d+)\s*([+\-*/]?)\s*(-?\d+)?/;
+    const regex = /(-?\d+(?:\.\d+)?)\s*([+\-*/]?)\s*(-?\d+(?:\.\d+)?)?/;
 
     // If no match, stop execution and return false
     if (input.match(regex) === null) {
@@ -87,7 +87,7 @@ function isValidOperation() {
 
 // Computes a result from a valid operation
 function compute() {
-    const regex = /(-?\d+)\s*([+\-*/]?)\s*(-?\d+)?/;
+    const regex = /(-?\d+(?:\.\d+)?)\s*([+\-*/]?)\s*(-?\d+(?:\.\d+)?)?/;
     const [_, firstOperand, operator, secondOperand] = input.match(regex);
 
     switch(operator) {
@@ -121,7 +121,7 @@ changeSignKey.addEventListener('click', () => {
     changeSign();
 })
 function changeSign() {
-    const regex = /(-?\d+)\s*([+\-*/]?)\s*(-?\d+)?/;
+    const regex = /(-?\d+(?:\.\d+)?)\s*([+\-*/]?)\s*(-?\d+(?:\.\d+)?)?/;
 
     // If no match, input is empty, simply append sign
     if (input.match(regex) === null) {
@@ -143,7 +143,7 @@ function changeSign() {
         }
         else if (!secondOperand && operator)
         {
-            secondOperand == '-';
+            secondOperand = '-';
             input = firstOperand + ' ' + operator + ' ' + secondOperand;
         }
         else if (firstOperand) {
@@ -159,11 +159,61 @@ function changeSign() {
     updateDisplay();
 }
 
+// Get decimal key as a variable
+const decimalKey = document.querySelector('.decimal');
+decimalKey.addEventListener('click', () => {
+    decimal();
+})
+// Add a decimal point only if a number doesn't already have one
+function decimal() {
+    const regex = /(-?\d+(?:\.\d+)?)\s*([+\-*/]?)\s*(-?\d+(?:\.\d+)?)?/;
+    const decimalRegex = /\./;
+
+    // If no match, input is empty, simply append a decimal point to 0
+    if (input.match(regex) === null) {
+        input = '0.';
+    }
+    else {
+        let [, firstOperand, operator, secondOperand] = input.match(regex);
+        if (secondOperand) {
+            // Test if secondOperand already contains a decimal
+            if (decimalRegex.test(secondOperand)) {
+                return;
+            }
+            else {
+                secondOperand += '.';
+            }
+            input = firstOperand + ' ' + operator + ' ' + secondOperand;
+            if (isValidOperation()) {
+                result = compute();
+            }
+        }
+        else if (!secondOperand && operator) {
+            secondOperand = '0.'
+            input = firstOperand + ' ' +  operator + ' ' + secondOperand;
+        }
+        else if (firstOperand) {
+            // Test if firstOperand contains already contains a decimal
+            if (decimalRegex.test(firstOperand)) {
+                return;
+            }
+            else {
+                firstOperand += '.';
+            }
+            input = firstOperand;
+        }
+
+    }
+    updateDisplay();
+}
+
+
 // Get backspace key as a variable
 const backspaceKey = document.querySelector('.backspace');
 backspaceKey.addEventListener('click', () => {
     backspace();
 })
+// Delete something and compute a new result if operation is still valid
 function backspace() {
     const keyToDelete = input.slice(-1);
 
@@ -185,12 +235,31 @@ function backspace() {
     updateDisplay();
 }
 
+// Get All Clear key as a variable
+const allclearKey = document.querySelector('.all-clear');
+allclearKey.addEventListener('click', () => {
+    allclear();
+})
+// "Clear" out everything by resetting global variables
+function allclear() {
+    input = '';
+    result = null;
+    opComplete = null;
+    display.innerText = '0';
+}
+
+// Get equals key as a variable
+const 
+
 // Enable keyboard input
 document.addEventListener('keydown', (event) => {
     const keyValue = getKeyValue(event.key);
     if (keyValue !== null) {
         if (keyValue === "Backspace") {
             backspace();
+        }
+        else if (keyValue === ".") {
+            decimal();
         }
         else {
             // Trigger the operate function with every valid key press
@@ -231,8 +300,8 @@ function getKeyValue(key) {
         return "*";
       case "/":
         return "/";
-    //   case ".":
-    //     return ".";
+      case ".":
+        return ".";
     //   case "Enter":
     //     return "=";
     //   case "Escape":
