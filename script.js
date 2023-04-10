@@ -335,14 +335,16 @@ function getKeyValue(key) {
   }
 
 function hal() {
-
+    if (document.getElementById('hal') != null) {
+        return;
+    }
     // Create easter egg elements and attach to title node
-    const newParagraph = document.createElement('p');
+    const eggNode = document.createElement('p');
     const halText = document.createTextNode("I'm sorry, Dave. I'm afraid I can't do that.");
-    newParagraph.appendChild(halText);
+    eggNode.appendChild(halText);
     const title = document.querySelector('.title');
     title.innerText = 'HALculator 9000';
-    title.appendChild(newParagraph);
+    title.appendChild(eggNode);
 
     const halImage = document.createElement('img');
     halImage.id = "hal";
